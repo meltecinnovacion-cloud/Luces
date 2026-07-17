@@ -1,0 +1,12 @@
+
+{
+    "vsmqtt.brokerProfiles": [
+        {
+            "name": "broker_meltec",
+            "host": "10.14.15.28",
+            "port": 1883,
+            "clientId": "vsmqtt_client_0df0",
+            "savedSubscriptions": []
+        }
+    ]
+}

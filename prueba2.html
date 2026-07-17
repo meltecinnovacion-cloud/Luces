@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MELTEC - Control de Iluminación</title>
+    
+    <link rel="stylesheet" href="prueba2.css">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="dashboard-container">
+
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="logo-area">
+                <span class="logo-text">MELTEC</span>
+                <i data-lucide="menu" class="icon-btn"></i>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active"><i data-lucide="home"></i> Vista General</button>
+                
+                <div class="nav-group">
+                    <span class="group-title">Pisos</span>
+                    <button class="nav-item sub-active">
+                        <span><i data-lucide="layers"></i> Piso 1</span>
+                        <span class="dot online"></span>
+                    </button>
+                    <button class="nav-item"><i data-lucide="layers"></i> Piso 2</button>
+                    <button class="nav-item"><i data-lucide="layers"></i> Piso 3</button>
+                </div>
+
+                <div class="nav-group">
+                    <span class="group-title">Controles</span>
+                    <button class="nav-item"><i data-lucide="layout-grid"></i> Por Bloques</button>
+                    <button class="nav-item"><i data-lucide="users"></i> Por Puestos</button>
+                </div>
+            </nav>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="help-box">
+                <i data-lucide="help-circle"></i>
+                <div>
+                    <h4>¿Necesitas ayuda?</h4>
+                    <p>Ver guía rápida</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="main-header">
+            <div>
+                <h1>Control de Iluminación</h1>
+                <p class="subtitle">Directorio por Pisos</p>
+            </div>
+
+            <div class="header-widgets">
+                <div class="kpi-card">
+                    <span class="kpi-title">Estado General</span>
+                    <div class="kpi-value status-on">
+                        <span class="dot online"></span> ENCENDIDO
+                    </div>
+                </div>
+                <div class="kpi-card"   >
+                    <div>
+                        <span class="kpi-title">Consumo Actual</span>
+                        <span class="kpi-number">2,450 W</span>
+                    </div>
+                    <i data-lucide="activity" class="icon-green"></i>
+                </div>
+                <div class="kpi-card">
+                    <div>
+                        <span class="kpi-title">Eficiencia</span>
+                        <span class="kpi-number">92%</span>
+                    </div>
+                    <i data-lucide="leaf" class="icon-green"></i>
+                </div>
+
+                <div class="user-actions">
+                    <i data-lucide="moon" class="action-icon"></i>
+                    <i data-lucide="bell" class="action-icon"></i>
+                    <div class="avatar">AU</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            <div class="title-bar">
+                <h2>Piso 1</h2>
+                <div class="filter-actions">
+                    <div class="tab-group">
+                        <button class="tab-btn active"><i data-lucide="map"></i> Vista del piso</button>
+                        <button class="tab-btn"><i data-lucide="layout-grid"></i> Por bloques</button>
+                        <button class="tab-btn"><i data-lucide="users"></i> Por puestos</button>
+                    </div>
+                    <button class="btn-outline"><i data-lucide="rotate-cw"></i> Actualizar</button>
+                </div>
+            </div>
+
+            <div class="master-switches">
+                <div class="switch-card">
+                    <div class="card-icon-red"><i data-lucide="power"></i></div>
+                    <div>
+                        <h3>APAGADO GENERAL</h3>
+                        <p>Todas las luces del piso</p>
+                    </div>
+                </div>
+                <div class="switch-card">
+                    <div class="card-icon-green"><i data-lucide="power"></i></div>
+                    <div>
+                        <h3>ENCENDIDO GENERAL</h3>
+                        <p>Todas las luces del piso</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="switch-card">
+                    <div>
+                        <p class="kpi-title">Estado del piso</p>
+                        <span class="status-text-on">● ENCENDIDO</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workspace-grid">
+                <div class="map-container">
+                    <div class="map-controls">
+                        <button><i data-lucide="plus"></i></button>
+                        <button><i data-lucide="minus"></i></button>
+                    </div>
+                    
+                    <div class="office-layout">
+                        <!-- El data-area debe coincidir exactamente con las llaves de la BD en JavaScript -->
+                        <div class="block-box layout-on" data-area="innovacion" style="cursor: pointer;"><h4>Innovación</h4><span class="badge-on">Encendido</span></div>
+                        <div class="block-box layout-on" data-area="compras" style="cursor: pointer;"><h4>Compras</h4><span class="badge-on">Encendido</span></div>
+                        <div class="block-box layout-on" data-area="mercadeo" style="cursor: pointer;"><h4>Mercadeo</h4><span class="badge-on">Encendido</span></div>
+                        
+                        <div class="block-box layout-on" data-area="huawei" style="cursor: pointer;"><h4>Huawei</h4><span class="badge-on">Encendido</span></div>
+                        <div class="block-box layout-on" data-area="aidc" style="cursor: pointer;"><h4>AIDC</h4><span class="badge-on">Encendido</span></div>
+                        <div class="block-box layout-partial" data-area="motorola" style="cursor: pointer;"><h4>Motorola</h4><span class="badge-partial">Parcial</span></div>
+                    </div>
+                </div>
+
+                <div class="blocks-sidebar">
+                    <h3 id="sidebar-title">Personal del Área</h3>
+                    
+                    <div class="block-list" id="people-list">
+                        <p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 20px;">Selecciona un área del mapa para ver los integrantes.</p>
+                    </div>
+
+                    <div class="legend-area">
+                        <span class="legend-title">Leyenda</span>
+                        <div class="legend-items">
+                            <span><span class="dot green"></span> Encendido</span>
+                            <span><span class="dot amber"></span> Parcial</span>
+                            <span><span class="dot red"></span> Apagado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Solo llamamos al script externo de forma segura -->
+    <script src="JavaScript.js" defer></script>
+</body>
+</html>
