@@ -8,5 +8,6 @@
             "clientId": "vsmqtt_client_0df0",
             "savedSubscriptions": []
         }
-    ]
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }

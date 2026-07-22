@@ -1,5 +1,5 @@
 // 🛠️ Dirección del servidor Backend Flask
-const BASE_URL = "http://127.0.0.1:5000";
+const BASE_URL = "https://ways-poly-gradually-citizen.trycloudflare.com"; // 👈 PON AQUÍ TU ENLACE REAL
 
 // Base de datos de personal por área integrada para evitar cruces de datos
 const personalPorArea = {
