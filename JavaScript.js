@@ -70,7 +70,7 @@ const personalPorArea = {
 // ==========================================================================
 function controlarLuzIndividual(checkbox) {
     const idLuz = checkbox.getAttribute('data-luz');
-    const area = checkbox.getAttribute('data-area'); // ⭐ OBTENEMOS EL ÁREA DEL SWITCH
+    const area = checkbox.getAttribute('data-area'); 
     const estaEncendido = checkbox.checked;
     const iconoFoco = document.getElementById(`foco-${idLuz}`);
 
@@ -82,7 +82,7 @@ function controlarLuzIndividual(checkbox) {
         body: JSON.stringify({ 
             luz_id: parseInt(idLuz), 
             estado: estaEncendido,
-            area: area // ⭐ ENVIAMOS EL ÁREA A FLASK
+            area: area 
         })
     })
     .then(res => {
@@ -102,7 +102,7 @@ function controlarLuzIndividual(checkbox) {
     })
     .catch(err => {
         console.error("❌ Fallo crítico comunicando con Flask:", err);
-        checkbox.checked = !estaEncendido; // Revertir visualmente el botón si falla
+        checkbox.checked = !estaEncendido; 
     });
 }
 
@@ -137,7 +137,6 @@ function cambiarEstadoPiso(numeroPiso, encender) {
     .catch(err => console.error(`❌ Error en comando masivo del Piso ${numeroPiso}:`, err));
 }
 
-// Asegurar que las funciones sean visibles globalmente para el HTML
 window.controlarLuzIndividual = controlarLuzIndividual;
 window.cambiarEstadoPiso = cambiarEstadoPiso;
 
@@ -202,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                             </div>
                             <label class="toggle-switch small">
-                                <!-- ⭐ SOLUCIÓN: Agregamos data-area para saber a qué grupo pertenece el switch -->
                                 <input type="checkbox" ${persona.estado} data-luz="${idLuzSimulado}" data-area="${areaSeleccionada}" onchange="controlarLuzIndividual(this)">
                                 <span class="slider"></span>
                             </label>
@@ -219,4 +217,47 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-});
+
+    // ==========================================================================
+    // 5. LÓGICA DEL MENÚ LATERAL (SIDEBAR)
+    // ==========================================================================
+    const botonesMenu = document.querySelectorAll('.sidebar-nav .nav-item');
+    const tituloPrincipal = document.querySelector('.title-bar h2'); 
+    const mapaContenedor = document.querySelector('.office-layout'); 
+
+    botonesMenu.forEach(boton => {
+        boton.addEventListener('click', function() {
+            // 1. Le quitamos la clase 'active' y 'sub-active' a todos los botones
+            botonesMenu.forEach(b => b.classList.remove('active', 'sub-active'));
+
+            // 2. Le ponemos la clase 'active' (azul) al botón presionado
+            this.classList.add('active');
+
+            // 3. Leemos qué botón se presionó
+            const opcionSeleccionada = this.innerText.trim();
+            console.log("Cargando vista para:", opcionSeleccionada);
+
+            // 4. Cambiamos el título de la página para que coincida con el menú
+            if (tituloPrincipal) {
+                const textoLimpio = opcionSeleccionada.split('\n').pop().trim();
+                tituloPrincipal.innerText = textoLimpio;
+            }
+
+            // 5. Lógica para ocultar/mostrar los mapas dependiendo del piso
+            if (opcionSeleccionada.includes("Piso 3")) {
+                // Si es el Piso 3, mostramos el mapa
+                if (mapaContenedor) mapaContenedor.style.display = ""; 
+            } 
+            else if (opcionSeleccionada.includes("Piso 1") || opcionSeleccionada.includes("Piso 2")) {
+                // Si es el Piso 1 o 2, ocultamos el mapa
+                if (mapaContenedor) mapaContenedor.style.display = "none";
+                
+                // Limpiamos la lista de personal del panel derecho
+                const listaPersonas = document.getElementById('people-list');
+                const tituloSidebar = document.getElementById('sidebar-title');
+                if (listaPersonas) listaPersonas.innerHTML = '<p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 20px;">Mapa en construcción para este piso.</p>';
+                if (tituloSidebar) tituloSidebar.innerText = 'Personal del Área';
+            }
+        });
+    });
+}); // <-- Esta es la llave final que cierra TODO el evento al cargar la página

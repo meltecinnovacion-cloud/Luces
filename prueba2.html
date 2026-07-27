@@ -23,14 +23,17 @@
                 
                 <div class="nav-group">
                     <span class="group-title">Pisos</span>
-                    <button class="nav-item sub-active">
+                    <button class="nav-item">
                         <span><i data-lucide="layers"></i> Piso 1</span>
-                        <span class="dot online"></span>
                     </button>
                     <button class="nav-item"><i data-lucide="layers"></i> Piso 2</button>
-                    <button class="nav-item"><i data-lucide="layers"></i> Piso 3</button>
+                    <!-- Ahora el Piso 3 es el activo por defecto -->
+                    <button class="nav-item sub-active active">
+                        <span><i data-lucide="layers"></i> Piso 3</span>
+                        <span class="dot online"></span>
+                    </button>
                 </div>
-
+                 
                 <div class="nav-group">
                     <span class="group-title">Controles</span>
                     <button class="nav-item"><i data-lucide="layout-grid"></i> Por Bloques</button>
@@ -89,7 +92,8 @@
 
         <div class="dashboard-body">
             <div class="title-bar">
-                <h2>Piso 1</h2>
+                <!-- Se cambió de Piso 1 a Piso 3 -->
+                <h2>Piso 3</h2>
                 <div class="filter-actions">
                     <div class="tab-group">
                         <button class="tab-btn active"><i data-lucide="map"></i> Vista del piso</button>
