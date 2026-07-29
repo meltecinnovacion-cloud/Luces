@@ -123,12 +123,17 @@
                         <span class="slider"></span>
                     </label>
                 </div>
-                <div class="switch-card">
-                    <div>
-                        <p class="kpi-title">Estado del piso</p>
-                        <span class="status-text-on">● ENCENDIDO</span>
-                    </div>
-                </div>
+              <div class="switch-card" id="tarjeta-control-area" style="opacity: 0.5; pointer-events: none;">
+    <div class="card-icon-green" id="icono-control-area"><i data-lucide="power"></i></div>
+    <div>
+        <h3 id="titulo-control-area">ESTADO DEL ÁREA</h3>
+        <p id="subtitulo-control-area">Selecciona un área en el mapa</p>
+    </div>
+    <label class="toggle-switch">
+        <input type="checkbox" id="toggle-control-area" checked>
+        <span class="slider"></span>
+    </label>
+</div>
             </div>
 
             <div class="workspace-grid">

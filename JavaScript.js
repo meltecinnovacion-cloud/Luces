@@ -65,6 +65,9 @@ const personalPorArea = {
     ]
 };
 
+// Variable global para saber qué área estamos viendo actualmente
+let areaActivaGlobal = null;
+
 // ==========================================================================
 // 1. INTERRUPTOR INDIVIDUAL (PUESTOS DE TRABAJO)
 // ==========================================================================
@@ -148,8 +151,36 @@ document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
     }
 
+    // ==========================================================================
+    // LÓGICA DEL NUEVO BOTÓN PARA APAGAR/ENCENDER ÁREA
+    // ==========================================================================
+    const toggleControlArea = document.getElementById('toggle-control-area');
+    if (toggleControlArea) {
+        toggleControlArea.addEventListener('change', (e) => {
+            if (!areaActivaGlobal) return;
+            
+            const encender = e.target.checked;
+            
+            // Cambiar el icono visual de la tarjeta
+            const iconoTarjeta = document.getElementById('icono-control-area');
+            iconoTarjeta.className = encender ? "card-icon-green" : "card-icon-red";
+            
+            // Buscar todos los interruptores individuales que están en la barra lateral
+            const interruptoresArea = document.querySelectorAll(`#people-list input[data-area="${areaActivaGlobal}"]`);
+            
+            interruptoresArea.forEach(chk => {
+                // Si el estado del switch individual es diferente al del switch general del área, lo cambiamos
+                if (chk.checked !== encender) {
+                    chk.checked = encender; 
+                    controlarLuzIndividual(chk); // Reutilizamos la función para enviar a Flask
+                }
+            });
+        });
+    }
+
     const tarjetasSwitch = document.querySelectorAll('.switch-card');
     
+    // Configuración de los interruptores generales (Apagar/Encender todo el piso)
     if (tarjetasSwitch.length >= 2) {
         tarjetasSwitch[0].style.cursor = 'pointer';
         tarjetasSwitch[0].addEventListener('click', () => {
@@ -179,6 +210,26 @@ document.addEventListener('DOMContentLoaded', () => {
         bloque.addEventListener('click', () => {
             const areaSeleccionada = bloque.getAttribute('data-area');
             console.log("-> Clic detectado en área:", areaSeleccionada);
+
+            // --- NUEVO CÓDIGO: Actualizar la tarjeta de control de área ---
+            areaActivaGlobal = areaSeleccionada;
+            
+            const tarjetaControl = document.getElementById('tarjeta-control-area');
+            const tituloControl = document.getElementById('titulo-control-area');
+            const subtituloControl = document.getElementById('subtitulo-control-area');
+            const toggleControl = document.getElementById('toggle-control-area');
+            
+            if (tarjetaControl && tituloControl) {
+                tarjetaControl.style.opacity = "1"; // Activar visualmente
+                tarjetaControl.style.pointerEvents = "auto"; // Permitir clics
+                tituloControl.innerText = `CONTROL: ${areaSeleccionada.toUpperCase()}`;
+                subtituloControl.innerText = `Todas las luces de ${areaSeleccionada}`;
+                
+                // Reiniciamos el interruptor en estado encendido (asumiendo que las luces están prendidas por defecto)
+                toggleControl.checked = true;
+                document.getElementById('icono-control-area').className = "card-icon-green";
+            }
+            // -------------------------------------------------------------
 
             const personas = personalPorArea[areaSeleccionada];
 
@@ -260,4 +311,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-}); // <-- Esta es la llave final que cierra TODO el evento al cargar la página
+});
