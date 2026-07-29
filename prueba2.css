@@ -588,3 +588,15 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 .icon-green { color: #16a34a; }
 .icon-red { color: #dc2626; }
+
+/* ==========================================================================
+   8. ANIMACIONES
+   ========================================================================== */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.spin-animation {
+    animation: spin 1s linear infinite;
+}

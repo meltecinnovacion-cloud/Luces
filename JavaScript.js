@@ -312,3 +312,76 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// ==========================================================================
+    // 6. FUNCIONALIDAD REAL DE LAS PESTAÑAS Y ACTUALIZAR
+    // ==========================================================================
+    const tabBtns = document.querySelectorAll('.tab-group .tab-btn');
+    const workspaceGrid = document.querySelector('.workspace-grid');
+    const mapContainer = document.querySelector('.map-container');
+    const sidebarContainer = document.querySelector('.blocks-sidebar');
+    const listaPersonas = document.getElementById('people-list');
+    const tituloSidebar = document.getElementById('sidebar-title');
+
+    // 1. Lógica de las pestañas (Tabs)
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Cambiar color del botón activo
+            tabBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            const textoPestaña = this.innerText.trim();
+
+            if (textoPestaña === 'Vista del piso') {
+                // MODO NORMAL: 75% Mapa / 25% Personal
+                workspaceGrid.style.display = 'grid';
+                workspaceGrid.style.gridTemplateColumns = '3fr 1fr';
+                mapContainer.style.display = 'flex';
+                sidebarContainer.style.display = 'flex';
+
+            } else if (textoPestaña === 'Por bloques') {
+                // MODO BLOQUES: 100% Mapa (Se oculta el personal)
+                workspaceGrid.style.display = 'block'; // Quitamos el grid
+                mapContainer.style.display = 'flex';
+                sidebarContainer.style.display = 'none';
+
+            } else if (textoPestaña === 'Por puestos') {
+                // MODO PUESTOS: 100% Personal (Se oculta el mapa)
+                workspaceGrid.style.display = 'block'; 
+                mapContainer.style.display = 'none';
+                sidebarContainer.style.display = 'flex';
+                
+                // Mensaje útil si no han seleccionado un área aún
+                if (!areaActivaGlobal) {
+                    tituloSidebar.innerText = 'Directorio de Puestos';
+                    listaPersonas.innerHTML = `
+                        <div style="text-align: center; padding: 40px 20px; color: #64748b;">
+                            <i data-lucide="users" style="width: 48px; height: 48px; color: #cbd5e1; margin-bottom: 10px;"></i>
+                            <p style="font-size: 14px;">Para ver los puestos aquí, primero vuelve a <b>"Vista del piso"</b> y selecciona un área específica (ej. Mercadeo).</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                }
+            }
+        });
+    });
+
+    // 2. Lógica del botón Actualizar
+    const btnActualizar = document.querySelector('.filter-actions .btn-outline');
+    if (btnActualizar) {
+        btnActualizar.addEventListener('click', function() {
+            // Buscamos el SVG directamente porque Lucide reemplaza la etiqueta <i>
+            const icono = this.querySelector('svg'); 
+            
+            if (icono) {
+                // Gira el icono para dar feedback visual
+                icono.style.transition = "transform 0.5s ease";
+                icono.style.transform = "rotate(360deg)";
+            }
+            
+            // Fuerza la recarga de la página después de medio segundo (500ms)
+            setTimeout(() => {
+                window.location.reload(); 
+            }, 500);
+        });
+    }
