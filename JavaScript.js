@@ -385,3 +385,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         });
     }
+
+// ==========================================================================
+// 7. LÓGICA DEL MENÚ HAMBURGUESA (A PRUEBA DE FALLOS)
+// ==========================================================================
+setTimeout(() => {
+    const areaLogo = document.querySelector('.logo-area');
+    const sidebar = document.querySelector('.sidebar');
+
+    if (areaLogo && sidebar) {
+        // Escuchamos el clic en el área del logo
+        areaLogo.addEventListener('click', (e) => {
+            // Validamos si el clic fue específicamente encima o muy cerca del icono del menú
+            if (e.target.closest('.icon-btn')) {
+                sidebar.classList.toggle('collapsed');
+                console.log("Menú hamburguesa presionado");
+            }
+        });
+    }
+}, 500);

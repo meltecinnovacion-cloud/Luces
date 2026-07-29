@@ -27,7 +27,6 @@
                         <span><i data-lucide="layers"></i> Piso 1</span>
                     </button>
                     <button class="nav-item"><i data-lucide="layers"></i> Piso 2</button>
-                    <!-- Ahora el Piso 3 es el activo por defecto -->
                     <button class="nav-item sub-active active">
                         <span><i data-lucide="layers"></i> Piso 3</span>
                         <span class="dot online"></span>
@@ -67,7 +66,7 @@
                         <span class="dot online"></span> ENCENDIDO
                     </div>
                 </div>
-                <div class="kpi-card"   >
+                <div class="kpi-card">
                     <div>
                         <span class="kpi-title">Consumo Actual</span>
                         <span class="kpi-number">2,450 W</span>
@@ -92,7 +91,6 @@
 
         <div class="dashboard-body">
             <div class="title-bar">
-                <!-- Se cambió de Piso 1 a Piso 3 -->
                 <h2>Piso 3</h2>
                 <div class="filter-actions">
                     <div class="tab-group">
@@ -123,28 +121,25 @@
                         <span class="slider"></span>
                     </label>
                 </div>
-              <div class="switch-card" id="tarjeta-control-area" style="opacity: 0.5; pointer-events: none;">
-    <div class="card-icon-green" id="icono-control-area"><i data-lucide="power"></i></div>
-    <div>
-        <h3 id="titulo-control-area">ESTADO DEL ÁREA</h3>
-        <p id="subtitulo-control-area">Selecciona un área en el mapa</p>
-    </div>
-    <label class="toggle-switch">
-        <input type="checkbox" id="toggle-control-area" checked>
-        <span class="slider"></span>
-    </label>
-</div>
+                <!-- INTERRUPTOR DE ÁREA DINÁMICO -->
+                <div class="switch-card" id="tarjeta-control-area" style="opacity: 0.5; pointer-events: none;">
+                    <div class="card-icon-green" id="icono-control-area"><i data-lucide="power"></i></div>
+                    <div>
+                        <h3 id="titulo-control-area">ESTADO DEL ÁREA</h3>
+                        <p id="subtitulo-control-area">Selecciona un área en el mapa</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-control-area" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
 
             <div class="workspace-grid">
                 <div class="map-container">
-                    <div class="map-controls">
-                        <button><i data-lucide="plus"></i></button>
-                        <button><i data-lucide="minus"></i></button>
-                    </div>
+                    <!-- BOTONES DE + Y - ELIMINADOS AQUÍ -->
                     
                     <div class="office-layout">
-                        <!-- El data-area debe coincidir exactamente con las llaves de la BD en JavaScript -->
                         <div class="block-box layout-on" data-area="innovacion" style="cursor: pointer;"><h4>Innovación</h4><span class="badge-on">Encendido</span></div>
                         <div class="block-box layout-on" data-area="compras" style="cursor: pointer;"><h4>Compras</h4><span class="badge-on">Encendido</span></div>
                         <div class="block-box layout-on" data-area="mercadeo" style="cursor: pointer;"><h4>Mercadeo</h4><span class="badge-on">Encendido</span></div>
@@ -175,7 +170,6 @@
         </div>
     </main>
 
-    <!-- Solo llamamos al script externo de forma segura -->
     <script src="JavaScript.js" defer></script>
 </body>
 </html>
