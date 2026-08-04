@@ -67,6 +67,7 @@ const personalPorArea = {
 
 // Variable global para saber qué área estamos viendo actualmente
 let areaActivaGlobal = null;
+let pisoActivoGlobal = 3; // Nace en el Piso 3 por defecto
 
 // ==========================================================================
 // 1. INTERRUPTOR INDIVIDUAL (PUESTOS DE TRABAJO)
@@ -93,13 +94,8 @@ function controlarLuzIndividual(checkbox) {
         console.log(`📡 Sincronización Exitosa -> [${area}] Luz ${idLuz}: ${estaEncendido ? 'ON' : 'OFF'}`);
         
         if (iconoFoco) {
-            if (estaEncendido) {
-                iconoFoco.className = "icon-green";
-                iconoFoco.setAttribute("data-lucide", "lightbulb");
-            } else {
-                iconoFoco.className = "icon-red";
-                iconoFoco.setAttribute("data-lucide", "lightbulb-off");
-            }
+            iconoFoco.className = estaEncendido ? "icon-green" : "icon-red";
+            iconoFoco.setAttribute("data-lucide", estaEncendido ? "lightbulb" : "lightbulb-off");
             lucide.createIcons(); 
         }
     })
@@ -144,26 +140,50 @@ window.controlarLuzIndividual = controlarLuzIndividual;
 window.cambiarEstadoPiso = cambiarEstadoPiso;
 
 // ==========================================================================
-// 3. ENLACE DE EVENTOS Y CONFIGURACIÓN AL CARGAR LA PÁGINA
+// 3. SINCRONIZACIÓN INICIAL (LEER ESTADO DESDE LA BD)
+// ==========================================================================
+function cargarEstadoLuces(numeroPiso) {
+    fetch(`${BASE_URL}/api/luces/estado`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ piso: numeroPiso })
+    })
+    .then(res => res.json())
+    .then(datosLuces => {
+        datosLuces.forEach(luz => {
+            const checkbox = document.querySelector(`input[data-luz="${luz.id_luz}"]`);
+            const iconoFoco = document.getElementById(`foco-${luz.id_luz}`);
+
+            if (checkbox && iconoFoco) {
+                if (checkbox.checked !== luz.estado) {
+                    checkbox.checked = luz.estado;
+                    iconoFoco.className = luz.estado ? "icon-green" : "icon-red";
+                    iconoFoco.setAttribute("data-lucide", luz.estado ? "lightbulb" : "lightbulb-off");
+                }
+            }
+        });
+        if (window.lucide) lucide.createIcons();
+    })
+    .catch(error => console.error("Error consultando BD:", error));
+}
+
+
+// ==========================================================================
+// 4. ENLACE DE EVENTOS Y CONFIGURACIÓN AL CARGAR LA PÁGINA
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.lucide) {
-        lucide.createIcons();
-    }
+    if (window.lucide) lucide.createIcons();
 
-    // LÓGICA DEL NUEVO BOTÓN PARA APAGAR/ENCENDER ÁREA
+    // -- Control de Área Completa --
     const toggleControlArea = document.getElementById('toggle-control-area');
     if (toggleControlArea) {
         toggleControlArea.addEventListener('change', (e) => {
             if (!areaActivaGlobal) return;
-            
             const encender = e.target.checked;
-            
             const iconoTarjeta = document.getElementById('icono-control-area');
-            iconoTarjeta.className = encender ? "card-icon-green" : "card-icon-red";
+            if(iconoTarjeta) iconoTarjeta.className = encender ? "card-icon-green" : "card-icon-red";
             
             const interruptoresArea = document.querySelectorAll(`#people-list input[data-area="${areaActivaGlobal}"]`);
-            
             interruptoresArea.forEach(chk => {
                 if (chk.checked !== encender) {
                     chk.checked = encender; 
@@ -173,26 +193,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Configuración del interruptor general (Apagar/Encender todo el piso)
+    // -- Interruptor General del Piso --
     const toggleGeneral = document.getElementById('toggle-general');
     if (toggleGeneral) {
         toggleGeneral.addEventListener('change', (e) => {
             const encenderTodo = e.target.checked;
-            
             if (!encenderTodo) {
-                if (!confirm("¿Estás seguro de que deseas APAGAR todas las luces de este piso?")) {
+                if (!confirm(`¿Estás seguro de que deseas APAGAR todas las luces del Piso ${pisoActivoGlobal}?`)) {
                     e.target.checked = true; 
                     return;
                 }
             }
-            
-            cambiarEstadoPiso(1, encenderTodo);
+            cambiarEstadoPiso(pisoActivoGlobal, encenderTodo);
         });
     }
 
-    // ==========================================================================
-    // 4. LÓGICA DE CLICS EN LOS BLOQUES DEL MAPA
-    // ==========================================================================
+    // -- Clics en los bloques del mapa --
     const bloques = document.querySelectorAll('.block-box');
     const listaPersonas = document.getElementById('people-list');
     const tituloSidebar = document.getElementById('sidebar-title');
@@ -200,9 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bloques.forEach(bloque => {
         bloque.addEventListener('click', () => {
             const areaSeleccionada = bloque.getAttribute('data-area');
-            console.log("-> Clic detectado en área:", areaSeleccionada);
-
-            // Actualizar la tarjeta de control de área
             areaActivaGlobal = areaSeleccionada;
             
             const tarjetaControl = document.getElementById('tarjeta-control-area');
@@ -215,9 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 tarjetaControl.style.pointerEvents = "auto";
                 tituloControl.innerText = `CONTROL: ${areaSeleccionada.toUpperCase()}`;
                 subtituloControl.innerText = `Todas las luces de ${areaSeleccionada}`;
-                
-                toggleControl.checked = true;
-                document.getElementById('icono-control-area').className = "card-icon-green";
+                toggleControl.checked = true; // Empieza prendido visualmente, luego Flask lo corrige
+                const icono = document.getElementById('icono-control-area');
+                if (icono) icono.className = "card-icon-green";
             }
 
             const personas = personalPorArea[areaSeleccionada];
@@ -228,20 +241,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 personas.forEach((persona, indice) => {
                     const idLuzSimulado = indice + 1; 
-                    const iconClass = persona.estado === "checked" ? "icon-green" : "icon-red";
-                    const iconType = persona.estado === "checked" ? "lightbulb" : "lightbulb-off";
-
+                    // Se dibujan apagados por defecto, Flask los prenderá 1 segundo después
                     const itemHTML = `
                         <div class="list-item">
                             <div class="item-info">
-                                <i data-lucide="${iconType}" class="${iconClass}" id="foco-${idLuzSimulado}"></i>
+                                <i data-lucide="lightbulb-off" class="icon-red" id="foco-${idLuzSimulado}"></i>
                                 <div>
                                     <h5>${persona.nombre}</h5>
                                     <p>${persona.puesto}</p>
                                 </div>
                             </div>
                             <label class="toggle-switch small">
-                                <input type="checkbox" ${persona.estado} data-luz="${idLuzSimulado}" data-area="${areaSeleccionada}" onchange="controlarLuzIndividual(this)">
+                                <input type="checkbox" data-luz="${idLuzSimulado}" data-area="${areaSeleccionada}" onchange="controlarLuzIndividual(this)">
                                 <span class="slider"></span>
                             </label>
                         </div>
@@ -249,18 +260,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     listaPersonas.insertAdjacentHTML('beforeend', itemHTML);
                 });
 
-                if (window.lucide) {
-                    lucide.createIcons();
-                }
-            } else {
-                console.warn(`No se encontraron personas registradas para el área: "${areaSeleccionada}"`);
+                if (window.lucide) lucide.createIcons();
+                // Pedirle a Flask que pinte de verde los que sí están prendidos
+                cargarEstadoLuces(pisoActivoGlobal);
             }
         });
     });
 
-   // ==========================================================================
-    // 5. LÓGICA DEL MENÚ LATERAL (SIDEBAR NAVEGACIÓN)
-    // ==========================================================================
+    // -- Navegación Lateral (Cambio de Pisos) --
     const botonesMenu = document.querySelectorAll('.sidebar-nav .nav-item');
     const tituloPrincipal = document.querySelector('.title-bar h2'); 
     const mapaContenedor = document.querySelector('.office-layout'); 
@@ -271,55 +278,34 @@ document.addEventListener('DOMContentLoaded', () => {
             this.classList.add('active');
 
             const opcionSeleccionada = this.innerText.trim();
-            console.log("Cargando vista para:", opcionSeleccionada);
+            if (opcionSeleccionada.includes("Piso 1")) pisoActivoGlobal = 1;
+            else if (opcionSeleccionada.includes("Piso 2")) pisoActivoGlobal = 2;
+            else if (opcionSeleccionada.includes("Piso 3")) pisoActivoGlobal = 3;
 
-            // 🌟 AQUÍ ESTÁ LA MAGIA: Actualizamos la variable global dinámicamente
-            if (opcionSeleccionada.includes("Piso 1")) {
-                pisoActivoGlobal = 1;
-            } else if (opcionSeleccionada.includes("Piso 2")) {
-                pisoActivoGlobal = 2;
-            } else if (opcionSeleccionada.includes("Piso 3")) {
-                pisoActivoGlobal = 3;
-            }
+            if (tituloPrincipal) tituloPrincipal.innerText = opcionSeleccionada.split('\n').pop().trim();
 
-            // Cambiar el título grande de la página
-            if (tituloPrincipal) {
-                const textoLimpio = opcionSeleccionada.split('\n').pop().trim();
-                tituloPrincipal.innerText = textoLimpio;
-            }
-
-            // Ocultar o mostrar el mapa dependiendo del piso
             if (opcionSeleccionada.includes("Piso 3")) {
                 if (mapaContenedor) mapaContenedor.style.display = ""; 
-            } 
-            else if (opcionSeleccionada.includes("Piso 1") || opcionSeleccionada.includes("Piso 2")) {
+            } else {
                 if (mapaContenedor) mapaContenedor.style.display = "none";
-                
-                const listaPersonas = document.getElementById('people-list');
-                const tituloSidebar = document.getElementById('sidebar-title');
                 if (listaPersonas) listaPersonas.innerHTML = '<p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 20px;">Mapa en construcción para este piso.</p>';
                 if (tituloSidebar) tituloSidebar.innerText = 'Personal del Área';
             }
             
-            // 🌟 FORZAMOS LA ACTUALIZACIÓN: Le pedimos a Flask las luces del nuevo piso que acabas de seleccionar
             cargarEstadoLuces(pisoActivoGlobal);
         });
     });
 
-    // ==========================================================================
-    // 6. FUNCIONALIDAD REAL DE LAS PESTAÑAS Y ACTUALIZAR
-    // ==========================================================================
+    // -- Lógica de las Pestañas (Tabs) --
     const tabBtns = document.querySelectorAll('.tab-group .tab-btn');
     const workspaceGrid = document.querySelector('.workspace-grid');
     const mapContainer = document.querySelector('.map-container');
     const sidebarContainer = document.querySelector('.blocks-sidebar');
 
-    // Lógica de las pestañas (Tabs)
     tabBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             tabBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-
             const textoPestaña = this.innerText.trim();
 
             if (textoPestaña === 'Vista del piso') {
@@ -327,63 +313,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 workspaceGrid.style.gridTemplateColumns = '3fr 1fr';
                 mapContainer.style.display = 'flex';
                 sidebarContainer.style.display = 'flex';
-
             } else if (textoPestaña === 'Por bloques') {
                 workspaceGrid.style.display = 'block'; 
                 mapContainer.style.display = 'flex';
                 sidebarContainer.style.display = 'none';
-
             } else if (textoPestaña === 'Por puestos') {
                 workspaceGrid.style.display = 'block'; 
                 mapContainer.style.display = 'none';
                 sidebarContainer.style.display = 'flex';
-                
-                if (!areaActivaGlobal) {
-                    tituloSidebar.innerText = 'Directorio de Puestos';
-                    listaPersonas.innerHTML = `
-                        <div style="text-align: center; padding: 40px 20px; color: #64748b;">
-                            <i data-lucide="users" style="width: 48px; height: 48px; color: #cbd5e1; margin-bottom: 10px;"></i>
-                            <p style="font-size: 14px;">Para ver los puestos aquí, primero vuelve a <b>"Vista del piso"</b> y selecciona un área específica (ej. Mercadeo).</p>
-                        </div>
-                    `;
-                    lucide.createIcons();
-                }
             }
         });
     });
 
-    // Lógica del botón Actualizar
+    // -- Botón de Actualizar --
     const btnActualizar = document.querySelector('.filter-actions .btn-outline');
     if (btnActualizar) {
         btnActualizar.addEventListener('click', function() {
             const icono = this.querySelector('svg'); 
-            
             if (icono) {
                 icono.style.transition = "transform 0.5s ease";
                 icono.style.transform = "rotate(360deg)";
             }
-            
-            setTimeout(() => {
-                window.location.reload(); 
-            }, 500);
+            setTimeout(() => window.location.reload(), 500);
         });
     }
 
+    // 🌟 MOTOR DE TIEMPO REAL: Actualiza la página cada 3 segundos
+    cargarEstadoLuces(pisoActivoGlobal);
+    setInterval(() => {
+        cargarEstadoLuces(pisoActivoGlobal);
+    }, 3000);
 });
 
-// ==========================================================================
-// 7. LÓGICA DEL MENÚ HAMBURGUESA (A PRUEBA DE FALLOS)
-// ==========================================================================
+// -- Menú Hamburguesa --
 setTimeout(() => {
     const areaLogo = document.querySelector('.logo-area');
     const sidebar = document.querySelector('.sidebar');
-
     if (areaLogo && sidebar) {
         areaLogo.addEventListener('click', (e) => {
-            if (e.target.closest('.icon-btn')) {
-                sidebar.classList.toggle('collapsed');
-                console.log("Menú hamburguesa presionado");
-            }
+            if (e.target.closest('.icon-btn')) sidebar.classList.toggle('collapsed');
         });
     }
 }, 500);
