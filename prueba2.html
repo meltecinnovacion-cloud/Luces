@@ -103,25 +103,19 @@
             </div>
 
             <div class="master-switches">
-                <div class="switch-card">
-                    <div class="card-icon-red"><i data-lucide="power"></i></div>
-                    <div>
-                        <h3>APAGADO GENERAL</h3>
-                        <p>Todas las luces del piso</p>
-                    </div>
-                </div>
+                <!-- Tarjeta de Control General -->
                 <div class="switch-card">
                     <div class="card-icon-green"><i data-lucide="power"></i></div>
                     <div>
-                        <h3>ENCENDIDO GENERAL</h3>
+                        <h3>CONTROL GENERAL</h3>
                         <p>Todas las luces del piso</p>
                     </div>
                     <label class="toggle-switch">
-                        <input type="checkbox" checked>
+                        <input type="checkbox" id="toggle-general" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
-                <!-- INTERRUPTOR DE ÁREA DINÁMICO -->
+                <!-- Tarjeta de Control por Área Dinámica -->
                 <div class="switch-card" id="tarjeta-control-area" style="opacity: 0.5; pointer-events: none;">
                     <div class="card-icon-green" id="icono-control-area"><i data-lucide="power"></i></div>
                     <div>
@@ -137,8 +131,7 @@
 
             <div class="workspace-grid">
                 <div class="map-container">
-                    <!-- BOTONES DE + Y - ELIMINADOS AQUÍ -->
-                    
+                    <!-- Los botones de + y - fueron eliminados de aquí -->
                     <div class="office-layout">
                         <div class="block-box layout-on" data-area="innovacion" style="cursor: pointer;"><h4>Innovación</h4><span class="badge-on">Encendido</span></div>
                         <div class="block-box layout-on" data-area="compras" style="cursor: pointer;"><h4>Compras</h4><span class="badge-on">Encendido</span></div>

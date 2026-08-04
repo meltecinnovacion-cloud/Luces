@@ -317,7 +317,7 @@ body.dashboard-container {
 /* MASTER SWITCHES */
 .master-switches {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr); /* Actualizado a 2 columnas */
     gap: 24px;
 }
 
@@ -394,33 +394,6 @@ body.dashboard-container {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.map-controls {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    overflow: hidden;
-    background: white;
-}
-
-.map-controls button {
-    border: none;
-    background: white;
-    padding: 8px;
-    cursor: pointer;
-    color: #64748b;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.map-controls button:first-child {
-    border-bottom: 1px solid #e2e8f0;
 }
 
 .office-layout {
@@ -534,16 +507,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     padding: 4px 0;
 }
 
-.sidebar {
-    width: 260px;
-    background-color: #0f172a;
-    color: #94a3b8;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex-shrink: 0;
-}
-
 .item-info {
     display: flex;
     gap: 10px;
@@ -600,20 +563,19 @@ input:checked + .slider:before { transform: translateX(20px); }
 .spin-animation {
     animation: spin 1s linear infinite;
 }
+
 /* ==========================================================================
    9. MENÚ HAMBURGUESA (COLAPSAR SIDEBAR)
    ========================================================================== */
 .sidebar {
     transition: width 0.3s ease !important;
-    overflow: hidden !important; /* Evita que los textos se salgan al encogerse */
+    overflow: hidden !important; 
 }
 
-/* Estado cuando la barra está encogida */
 .sidebar.collapsed {
     width: 80px !important; 
 }
 
-/* Ocultar textos cuando está colapsado */
 .sidebar.collapsed .logo-text,
 .sidebar.collapsed .group-title,
 .sidebar.collapsed .help-box div,
@@ -621,12 +583,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     display: none !important; 
 }
 
-/* Centrar el ícono del menú */
 .sidebar.collapsed .logo-area {
     justify-content: center !important;
 }
 
-/* Ocultar el texto de los botones y centrar los iconos */
 .sidebar.collapsed .nav-item {
     font-size: 0 !important; 
     color: transparent !important;

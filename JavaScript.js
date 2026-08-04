@@ -151,9 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
     }
 
-    // ==========================================================================
     // LÓGICA DEL NUEVO BOTÓN PARA APAGAR/ENCENDER ÁREA
-    // ==========================================================================
     const toggleControlArea = document.getElementById('toggle-control-area');
     if (toggleControlArea) {
         toggleControlArea.addEventListener('change', (e) => {
@@ -161,42 +159,35 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const encender = e.target.checked;
             
-            // Cambiar el icono visual de la tarjeta
             const iconoTarjeta = document.getElementById('icono-control-area');
             iconoTarjeta.className = encender ? "card-icon-green" : "card-icon-red";
             
-            // Buscar todos los interruptores individuales que están en la barra lateral
             const interruptoresArea = document.querySelectorAll(`#people-list input[data-area="${areaActivaGlobal}"]`);
             
             interruptoresArea.forEach(chk => {
-                // Si el estado del switch individual es diferente al del switch general del área, lo cambiamos
                 if (chk.checked !== encender) {
                     chk.checked = encender; 
-                    controlarLuzIndividual(chk); // Reutilizamos la función para enviar a Flask
+                    controlarLuzIndividual(chk);
                 }
             });
         });
     }
 
-    const tarjetasSwitch = document.querySelectorAll('.switch-card');
-    
-    // Configuración de los interruptores generales (Apagar/Encender todo el piso)
-    if (tarjetasSwitch.length >= 2) {
-        tarjetasSwitch[0].style.cursor = 'pointer';
-        tarjetasSwitch[0].addEventListener('click', () => {
-            if (confirm("¿Estás seguro de que deseas apagar todas las luces de este piso?")) {
-                cambiarEstadoPiso(1, false);
-                const chkGeneral = tarjetasSwitch[1].querySelector('input[type="checkbox"]');
-                if (chkGeneral) chkGeneral.checked = false;
+    // Configuración del interruptor general (Apagar/Encender todo el piso)
+    const toggleGeneral = document.getElementById('toggle-general');
+    if (toggleGeneral) {
+        toggleGeneral.addEventListener('change', (e) => {
+            const encenderTodo = e.target.checked;
+            
+            if (!encenderTodo) {
+                if (!confirm("¿Estás seguro de que deseas APAGAR todas las luces de este piso?")) {
+                    e.target.checked = true; 
+                    return;
+                }
             }
+            
+            cambiarEstadoPiso(1, encenderTodo);
         });
-
-        const checkboxGeneral = tarjetasSwitch[1].querySelector('input[type="checkbox"]');
-        if (checkboxGeneral) {
-            checkboxGeneral.addEventListener('change', (e) => {
-                cambiarEstadoPiso(1, e.target.checked);
-            });
-        }
     }
 
     // ==========================================================================
@@ -211,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const areaSeleccionada = bloque.getAttribute('data-area');
             console.log("-> Clic detectado en área:", areaSeleccionada);
 
-            // --- NUEVO CÓDIGO: Actualizar la tarjeta de control de área ---
+            // Actualizar la tarjeta de control de área
             areaActivaGlobal = areaSeleccionada;
             
             const tarjetaControl = document.getElementById('tarjeta-control-area');
@@ -220,16 +211,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const toggleControl = document.getElementById('toggle-control-area');
             
             if (tarjetaControl && tituloControl) {
-                tarjetaControl.style.opacity = "1"; // Activar visualmente
-                tarjetaControl.style.pointerEvents = "auto"; // Permitir clics
+                tarjetaControl.style.opacity = "1";
+                tarjetaControl.style.pointerEvents = "auto";
                 tituloControl.innerText = `CONTROL: ${areaSeleccionada.toUpperCase()}`;
                 subtituloControl.innerText = `Todas las luces de ${areaSeleccionada}`;
                 
-                // Reiniciamos el interruptor en estado encendido (asumiendo que las luces están prendidas por defecto)
                 toggleControl.checked = true;
                 document.getElementById('icono-control-area').className = "card-icon-green";
             }
-            // -------------------------------------------------------------
 
             const personas = personalPorArea[areaSeleccionada];
 
@@ -269,8 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ==========================================================================
-    // 5. LÓGICA DEL MENÚ LATERAL (SIDEBAR)
+   // ==========================================================================
+    // 5. LÓGICA DEL MENÚ LATERAL (SIDEBAR NAVEGACIÓN)
     // ==========================================================================
     const botonesMenu = document.querySelectorAll('.sidebar-nav .nav-item');
     const tituloPrincipal = document.querySelector('.title-bar h2'); 
@@ -278,80 +267,77 @@ document.addEventListener('DOMContentLoaded', () => {
 
     botonesMenu.forEach(boton => {
         boton.addEventListener('click', function() {
-            // 1. Le quitamos la clase 'active' y 'sub-active' a todos los botones
             botonesMenu.forEach(b => b.classList.remove('active', 'sub-active'));
-
-            // 2. Le ponemos la clase 'active' (azul) al botón presionado
             this.classList.add('active');
 
-            // 3. Leemos qué botón se presionó
             const opcionSeleccionada = this.innerText.trim();
             console.log("Cargando vista para:", opcionSeleccionada);
 
-            // 4. Cambiamos el título de la página para que coincida con el menú
+            // 🌟 AQUÍ ESTÁ LA MAGIA: Actualizamos la variable global dinámicamente
+            if (opcionSeleccionada.includes("Piso 1")) {
+                pisoActivoGlobal = 1;
+            } else if (opcionSeleccionada.includes("Piso 2")) {
+                pisoActivoGlobal = 2;
+            } else if (opcionSeleccionada.includes("Piso 3")) {
+                pisoActivoGlobal = 3;
+            }
+
+            // Cambiar el título grande de la página
             if (tituloPrincipal) {
                 const textoLimpio = opcionSeleccionada.split('\n').pop().trim();
                 tituloPrincipal.innerText = textoLimpio;
             }
 
-            // 5. Lógica para ocultar/mostrar los mapas dependiendo del piso
+            // Ocultar o mostrar el mapa dependiendo del piso
             if (opcionSeleccionada.includes("Piso 3")) {
-                // Si es el Piso 3, mostramos el mapa
                 if (mapaContenedor) mapaContenedor.style.display = ""; 
             } 
             else if (opcionSeleccionada.includes("Piso 1") || opcionSeleccionada.includes("Piso 2")) {
-                // Si es el Piso 1 o 2, ocultamos el mapa
                 if (mapaContenedor) mapaContenedor.style.display = "none";
                 
-                // Limpiamos la lista de personal del panel derecho
                 const listaPersonas = document.getElementById('people-list');
                 const tituloSidebar = document.getElementById('sidebar-title');
                 if (listaPersonas) listaPersonas.innerHTML = '<p style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 20px;">Mapa en construcción para este piso.</p>';
                 if (tituloSidebar) tituloSidebar.innerText = 'Personal del Área';
             }
+            
+            // 🌟 FORZAMOS LA ACTUALIZACIÓN: Le pedimos a Flask las luces del nuevo piso que acabas de seleccionar
+            cargarEstadoLuces(pisoActivoGlobal);
         });
     });
-});
 
-// ==========================================================================
+    // ==========================================================================
     // 6. FUNCIONALIDAD REAL DE LAS PESTAÑAS Y ACTUALIZAR
     // ==========================================================================
     const tabBtns = document.querySelectorAll('.tab-group .tab-btn');
     const workspaceGrid = document.querySelector('.workspace-grid');
     const mapContainer = document.querySelector('.map-container');
     const sidebarContainer = document.querySelector('.blocks-sidebar');
-    const listaPersonas = document.getElementById('people-list');
-    const tituloSidebar = document.getElementById('sidebar-title');
 
-    // 1. Lógica de las pestañas (Tabs)
+    // Lógica de las pestañas (Tabs)
     tabBtns.forEach(btn => {
         btn.addEventListener('click', function() {
-            // Cambiar color del botón activo
             tabBtns.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
 
             const textoPestaña = this.innerText.trim();
 
             if (textoPestaña === 'Vista del piso') {
-                // MODO NORMAL: 75% Mapa / 25% Personal
                 workspaceGrid.style.display = 'grid';
                 workspaceGrid.style.gridTemplateColumns = '3fr 1fr';
                 mapContainer.style.display = 'flex';
                 sidebarContainer.style.display = 'flex';
 
             } else if (textoPestaña === 'Por bloques') {
-                // MODO BLOQUES: 100% Mapa (Se oculta el personal)
-                workspaceGrid.style.display = 'block'; // Quitamos el grid
+                workspaceGrid.style.display = 'block'; 
                 mapContainer.style.display = 'flex';
                 sidebarContainer.style.display = 'none';
 
             } else if (textoPestaña === 'Por puestos') {
-                // MODO PUESTOS: 100% Personal (Se oculta el mapa)
                 workspaceGrid.style.display = 'block'; 
                 mapContainer.style.display = 'none';
                 sidebarContainer.style.display = 'flex';
                 
-                // Mensaje útil si no han seleccionado un área aún
                 if (!areaActivaGlobal) {
                     tituloSidebar.innerText = 'Directorio de Puestos';
                     listaPersonas.innerHTML = `
@@ -366,25 +352,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 2. Lógica del botón Actualizar
+    // Lógica del botón Actualizar
     const btnActualizar = document.querySelector('.filter-actions .btn-outline');
     if (btnActualizar) {
         btnActualizar.addEventListener('click', function() {
-            // Buscamos el SVG directamente porque Lucide reemplaza la etiqueta <i>
             const icono = this.querySelector('svg'); 
             
             if (icono) {
-                // Gira el icono para dar feedback visual
                 icono.style.transition = "transform 0.5s ease";
                 icono.style.transform = "rotate(360deg)";
             }
             
-            // Fuerza la recarga de la página después de medio segundo (500ms)
             setTimeout(() => {
                 window.location.reload(); 
             }, 500);
         });
     }
+
+});
 
 // ==========================================================================
 // 7. LÓGICA DEL MENÚ HAMBURGUESA (A PRUEBA DE FALLOS)
@@ -394,9 +379,7 @@ setTimeout(() => {
     const sidebar = document.querySelector('.sidebar');
 
     if (areaLogo && sidebar) {
-        // Escuchamos el clic en el área del logo
         areaLogo.addEventListener('click', (e) => {
-            // Validamos si el clic fue específicamente encima o muy cerca del icono del menú
             if (e.target.closest('.icon-btn')) {
                 sidebar.classList.toggle('collapsed');
                 console.log("Menú hamburguesa presionado");
